@@ -1,0 +1,1 @@
+# Trendell-FALL2025-SQA
