@@ -1,0 +1,23 @@
+name: Run Fuzzer
+
+on: [push, pull_request]
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      - name: Run the fuzzer
+        run: python fuzz.py
+
+      - name: Upload fuzzing report
+        uses: actions/upload-artifact@v3
+        with:
+          name: fuzz_report
+          path: fuzz_report.txt
