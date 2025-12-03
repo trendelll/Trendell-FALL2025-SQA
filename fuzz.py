@@ -5,7 +5,6 @@ import ast
 import os
 import sys
 
-# Add FAME-ML folder to the path
 sys.path.append("MLForensics/MLForensics_farzana/FAME-ML")
 
 # Import the modules
@@ -52,7 +51,7 @@ def fuzz_function(func, trials=50):
         for i in range(trials):
             try:
                 if func.__name__ == "getPythonParseObject":
-                    # Provide random file paths
+                    
                     fake_path = "/tmp/" + random_string() + ".py"
                     func(fake_path)
                 elif func.__name__ in ["commonAttribCallBody", "getFunctionAssignments",
