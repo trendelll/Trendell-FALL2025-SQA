@@ -1,24 +1,39 @@
-name: Run Fuzzer
+name: Run Fuzzer and Parser
 
 on: [push, pull_request]
 
 jobs:
-  fuzz:
+  fuzz_and_parse:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout repo
       - uses: actions/checkout@v4
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # Step 3: Run the fuzzer
       - name: Run the fuzzer
         run: python fuzz.py
 
+      # Step 4: Upload fuzzing report
       - name: Upload fuzzing report
         uses: actions/upload-artifact@v4
         with:
           name: fuzz_report
           path: 4a_fuzz_report.txt
+
+      # Step 5: Run py_parser.py
+      - name: Run py_parser
+        run: python MLForensics/MLForensics_farzana/FAME-ML/py_parser.py
+
+      # Step 6: Upload parser log
+      - name: Upload py_parser log
+        uses: actions/upload-artifact@v4
+        with:
+          name: py_parser_log
+          path: MLForensics/MLForensics_farzana/FAME-ML/fame_ml_forensics.log
