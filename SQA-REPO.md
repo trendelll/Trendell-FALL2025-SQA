@@ -1,23 +1,43 @@
-﻿4a:
-    • Created fuzz.py for py_parser.py
-        ◦ Learned how to fuzz methods which helps to identify weaknesses in code for more robust, secure code by generating many random, corrupt inputs which could be exploited by the wrong users.
-    • Fuzzes methods:
-        ◦ 
-	  py_parser.getPythonParseObject,
-        py_parser.commonAttribCallBody,
-        py_parser.getFunctionAssignments,
-        py_parser.getPythonAtrributeFuncs,
-        py_parser.getFunctionDefinitions 
-    • Fuzz data saved under file 4a_fuzz_report.txt
+﻿# FAME-ML Forensics and Fuzzing Summary
 
-4b:
-    • Added Logging to py_parser.py
-        ◦ Learned to use logging to add forensics which can help trace or observe a programs functionality which adds security and can even make it easier to debug.
-    • Log data saved under fame_ml_foresensics.log
+## 4a: Fuzzing `py_parser.py`
+- **Created `fuzz.py` for `py_parser.py`**
+  - Learned how to perform fuzz testing to identify hidden bugs and edge cases.  
+  - Gained experience generating invalid or unexpected inputs to test code robustness and security.  
 
+- **Methods fuzzed**
+  - `py_parser.getPythonParseObject`  
+    - Learned how AST parsing works and the importance of handling exceptions.  
+  - `py_parser.commonAttribCallBody`  
+    - Learned to test nested or chained function calls for edge cases.  
+  - `py_parser.getFunctionAssignments`  
+    - Learned to extract and verify function assignments for program analysis.  
+  - `py_parser.getPythonAtrributeFuncs`  
+    - Learned to handle attribute-based function calls and complex attribute chains.  
+  - `py_parser.getFunctionDefinitions`  
+    - Learned to identify function definitions and handle uncommon patterns.
 
-4c:
-    • Added Github action to automatically run fuzz.py and py_parser.py which automatically outputs the fuzz report and the logging results which helps to ensure security whenever a new change is made to the repo. This ensures a secure software development process by automating security.
+- **Fuzzing output**
+  - Saved under `4a_fuzz_report.txt`
 
-Location of github action: 
-.github/workflows/main.yml
+---
+
+## 4b: Adding Logging to `py_parser.py`
+- **Implemented detailed logging**
+  - Learned to use Python logging to capture key events: parsing, exceptions, function assignments, and feature extraction.  
+  - Gained insight into how logging aids debugging, tracing program flow, and enhancing security.  
+  - Learned to balance logging levels: `DEBUG` for details, `INFO`/`WARNING` for higher-level events.
+
+- **Log output**
+  - Saved under `fame_ml_forensics.log`
+
+---
+
+## 4c: Continuous Integration with GitHub Actions
+- **Added GitHub Action**
+  - Learned to automate testing workflows using GitHub Actions.  
+  - Gained experience in running scripts automatically, capturing outputs, and ensuring reproducible security checks.  
+  - Learned how automation improves software security by detecting issues immediately and providing audit-ready logs and reports.
+
+- **Location of GitHub Action**
+  - `.github/workflows/main.yml`
