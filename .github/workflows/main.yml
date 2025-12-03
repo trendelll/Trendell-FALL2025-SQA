@@ -21,4 +21,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fuzz_report
-          path: fuzz_report.txt
+          path: 4a_fuzz_report.txt
