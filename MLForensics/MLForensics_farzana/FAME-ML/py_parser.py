@@ -84,14 +84,17 @@ def checkAttribFuncsInExcept(expr_obj):
 
 
 def getPythonParseObject(pyFile): 
-    logging.debug(f"Parsing file: {pyFile}")
+    logging.debug(f"Attempting to parse file: {pyFile}")
     try:
         full_tree = ast.parse(open(pyFile).read())    
         logging.info(f"Successfully parsed file: {pyFile}")
     except SyntaxError as e:
         logging.error(f"Syntax error parsing {pyFile}: {e}")
         full_tree = ast.parse(constants.EMPTY_STRING) 
-    return full_tree 
+    except Exception as e:
+        logging.error(f"Unexpected error parsing {pyFile}: {e}")
+        full_tree = ast.parse(constants.EMPTY_STRING)
+    return full_tree
 
 
 def commonAttribCallBody(node_):
@@ -131,7 +134,7 @@ def getFunctionAssignments(pyTree):
                     for target in targets:
                         if isinstance(target, ast.Name):
                             lhs = target.id
-                    logging.debug(f"Found assignment: {lhs} = {funcName}")
+                    logging.debug(f"Found assignment at line {funcLineNo}: {lhs} = {funcName.id if isinstance(funcName, ast.Name) else funcName}")
                     call_list.append((lhs, funcName.id if isinstance(funcName, ast.Name) else funcName, funcLineNo, []))  
     logging.info(f"Total function assignments found: {len(call_list)}")
     return call_list
@@ -183,7 +186,7 @@ def getModelFeature(pyTree):
                         if isinstance(target, ast.Name):
                             lhs = target.id
                     feature_list.append((lhs, className.id if isinstance(className, ast.Name) else className, featureName, funcLineNo))
-                    logging.debug(f"Feature extracted: {lhs} -> {featureName} of {className}")
+                    logging.debug(f"Feature extracted at line {funcLineNo}: {lhs} -> {featureName} of {className.id if isinstance(className, ast.Name) else className}")
     logging.info(f"Total model features extracted: {len(feature_list)}")
     return feature_list
 
