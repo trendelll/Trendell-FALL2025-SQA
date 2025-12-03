@@ -1,89 +1,86 @@
 import random
 import string
-import json
-import math
+import traceback
+import ast
+import os
+import sys
 
-# Functions
-def safe_div(a, b):
-    return a / b
+# Add FAME-ML folder to the path
+sys.path.append("MLForensics/MLForensics_farzana/FAME-ML")
 
-def reverse_string(s):
-    return s[::-1]
+# Import the modules
+import py_parser
+import constants
 
-def parse_json(txt):
-    return json.loads(txt)
+BUG_REPORT_FILE = "4a_fuzz_report.txt"
 
-def sqrt_value(x):
-    return math.sqrt(x)
+def random_string(length=10):
+    return ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=length))
 
-def list_index(lst, idx):
-    return lst[idx]
+def random_ast_node():
+    """Generate a random AST node (may or may not be valid)."""
+    node_types = [ast.Call, ast.Name, ast.Attribute, ast.Assign, ast.Expr]
+    node_type = random.choice(node_types)
+    try:
+        if node_type == ast.Call:
+            return ast.Call(
+                func=ast.Name(id=random_string(), ctx=ast.Load()),
+                args=[],
+                keywords=[]
+            )
+        elif node_type == ast.Name:
+            return ast.Name(id=random_string(), ctx=ast.Load())
+        elif node_type == ast.Attribute:
+            return ast.Attribute(
+                value=ast.Name(id=random_string(), ctx=ast.Load()),
+                attr=random_string(),
+                ctx=ast.Load()
+            )
+        elif node_type == ast.Assign:
+            return ast.Assign(
+                targets=[ast.Name(id=random_string(), ctx=ast.Store())],
+                value=ast.Constant(value=random_string())
+            )
+        elif node_type == ast.Expr:
+            return ast.Expr(value=ast.Constant(value=random_string()))
+    except Exception:
+        return None
 
-# Input generators
-
-def rand_num():
-    return random.choice([
-        random.randint(-1000, 1000),
-        random.uniform(-1000, 1000),
-        None,
-        "not_a_number",
-    ])
-
-def rand_string():
-    size = random.randint(0, 50)
-    return ''.join(random.choice(string.printable) for _ in range(size))
-
-def rand_json():
-    if random.random() < 0.5:
-        return rand_string()  # malformed JSON
-    return json.dumps({"val": rand_num(), "text": rand_string()})
-
-def rand_list():
-    size = random.randint(0, 20)
-    return [rand_num() for _ in range(size)]
-
-# Fuzzing loop
-
-def fuzz():
-    bugs = []
-
-    for i in range(5000):  # run 5k iterations
-        # safe_div fuzz
-        try:
-            safe_div(rand_num(), rand_num())
-        except Exception as e:
-            bugs.append(("safe_div", str(e)))
-
-        # reverse_string fuzz
-        try:
-            reverse_string(random.choice([rand_string(), rand_num(), rand_list()]))
-        except Exception as e:
-            bugs.append(("reverse_string", str(e)))
-
-        # parse_json fuzz
-        try:
-            parse_json(rand_json())
-        except Exception as e:
-            bugs.append(("parse_json", str(e)))
-
-        # sqrt_value fuzz
-        try:
-            sqrt_value(rand_num())
-        except Exception as e:
-            bugs.append(("sqrt_value", str(e)))
-
-        # list_index fuzz
-        try:
-            lst = rand_list()
-            idx = random.randint(-10, 30)
-            list_index(lst, idx)
-        except Exception as e:
-            bugs.append(("list_index", str(e)))
-
-    # record results
-    with open("fuzz_report.txt", "w") as f:
-        for fn, err in bugs:
-            f.write(f"{fn} error: {err}\n")
+def fuzz_function(func, trials=50):
+    """Fuzz a function with random inputs."""
+    with open(BUG_REPORT_FILE, "a") as f:
+        for i in range(trials):
+            try:
+                if func.__name__ == "getPythonParseObject":
+                    # Provide random file paths
+                    fake_path = "/tmp/" + random_string() + ".py"
+                    func(fake_path)
+                elif func.__name__ in ["commonAttribCallBody", "getFunctionAssignments",
+                                       "getPythonAtrributeFuncs", "getFunctionDefinitions"]:
+                    # Provide random AST nodes
+                    node = random_ast_node()
+                    if node is None:
+                        continue
+                    func(node)
+            except Exception as e:
+                f.write(f"Function {func.__name__} crashed on trial {i}:\n")
+                f.write(traceback.format_exc())
+                f.write("\n" + "-"*80 + "\n")
 
 if __name__ == "__main__":
-    fuzz()
+    # Clear previous bug report
+    if os.path.exists(BUG_REPORT_FILE):
+        os.remove(BUG_REPORT_FILE)
+
+    functions_to_fuzz = [
+        py_parser.getPythonParseObject,
+        py_parser.commonAttribCallBody,
+        py_parser.getFunctionAssignments,
+        py_parser.getPythonAtrributeFuncs,
+        py_parser.getFunctionDefinitions
+    ]
+
+    for func in functions_to_fuzz:
+        fuzz_function(func)
+
+    print(f"Fuzzing complete. Check {BUG_REPORT_FILE} for any crashes found.")
