@@ -36,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: py_parser_log
-          path: MLForensics/MLForensics_farzana/FAME-ML/fame_ml_forensics.log
+          path: fame_ml_forensics.log
