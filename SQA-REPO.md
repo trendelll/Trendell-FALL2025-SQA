@@ -14,6 +14,8 @@
     • Added Logging to py_parser.py
         ◦ Learned to use logging to add forensics which can help trace or observe a programs functionality which adds security and can even make it easier to debug.
     • Log data saved under fame_ml_foresensics.log
+
+
 4c:
     • Added Github action to automatically run fuzz.py and py_parser.py which automatically outputs the fuzz report and the logging results which helps to ensure security whenever a new change is made to the repo. This ensures a secure software development process by automating security.
 
